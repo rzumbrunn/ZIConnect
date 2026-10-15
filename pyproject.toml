@@ -1,0 +1,20 @@
+[project]
+name = "ziconnect"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Raphael Zumbrunn", email = "rzumbrunn@ethz.ch" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "matplotlib>=3.11.2",
+    "rich>=15.0.0",
+    "scipy>=1.18.1",
+    "tdqm>=0.0.1",
+    "zhinst-toolkit>=1.4.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.10.4,<0.11.0"]
+build-backend = "uv_build"
