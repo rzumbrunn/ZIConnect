@@ -2,10 +2,12 @@ import time
 
 import matplotlib.pyplot as plt
 import numpy as np
+import optuna
 import zhinst.core as zi
 
 from ziconnect import ZICustomConnection
 
+artifact_store = optuna.artifacts.FileSystemArtifactStore("data/artifacts")
 
 def optuna_objective(trial, host, port, serial, span):
 
@@ -22,8 +24,8 @@ def optuna_objective(trial, host, port, serial, span):
     F0 = 0
     BW0 = 1000
 
-    P = trial.suggest_float("P", 0.1 * P0, 10 * P0)
-    I = trial.suggest_float("I", 0.1 * I0, 10 * I0)
+    P = trial.suggest_float("P", 1 * P0, 100 * P0)
+    I = trial.suggest_float("I", 0.1 * I0, 100 * I0)
     D = trial.suggest_float("D", 0.1 * D0, 10 * D0)
     # F = trial.suggest_float("F", 0.1 * F0, 10 * F0)
     # BW = trial.suggest_float("BW", 0.1 * BW0, 10 * BW0)
@@ -31,6 +33,11 @@ def optuna_objective(trial, host, port, serial, span):
     BW = 1 * BW0  # Keep BW fixed for now
 
     score = test_pll_params(host, port, serial, P, I, D, F, BW, span)
+    optuna.artifacts.upload_artifact(
+        artifact_store=artifact_store,
+        study_or_trial=trial,
+        file_path=f"data/phase_noise_comparison_{serial}_P{P}_I{I}_D{D}_F{F}_BW{BW}.png",
+    )
 
     return score
 
