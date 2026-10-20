@@ -7,6 +7,34 @@ import zhinst.core as zi
 from ziconnect import ZICustomConnection
 
 
+def optuna_objective(trial, host, port, serial, span):
+
+    # P0 = 1.5
+    # I0 = 5.0e3
+    # D0 = 1.5 / (10.0e3)
+    # F0 = 0
+    # BW0 = 1000
+
+    # Trial 2
+    P0 = 14.188084934437933
+    I0 = 42669.089183065145
+    D0 = 0.0014779803568506133
+    F0 = 0
+    BW0 = 1000
+
+    P = trial.suggest_float("P", 0.1 * P0, 10 * P0)
+    I = trial.suggest_float("I", 0.1 * I0, 10 * I0)
+    D = trial.suggest_float("D", 0.1 * D0, 10 * D0)
+    # F = trial.suggest_float("F", 0.1 * F0, 10 * F0)
+    # BW = trial.suggest_float("BW", 0.1 * BW0, 10 * BW0)
+    F = 1 * F0  # Keep F fixed for now
+    BW = 1 * BW0  # Keep BW fixed for now
+
+    score = test_pll_params(host, port, serial, P, I, D, F, BW, span)
+
+    return score
+
+
 def test_pll_params(host, port, serial, P, I, D, F, BW, span):
 
     daq = zi.ziDAQServer(host, port, 0)

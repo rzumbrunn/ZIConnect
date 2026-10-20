@@ -1,8 +1,8 @@
 import os
 
-import scipy as sp
+import optuna
 
-from ziconnect import ZIOptimize, ZISettingsHelper
+from ziconnect import ZICustomConnection, ZIOptimize, ZISettingsHelper
 
 
 def main():
@@ -13,9 +13,9 @@ def main():
             ZISettingsHelper.normalize(f"raw/{file}", f"normalized/{file}")
 
     # Initialize standard session with pll
-    # session = ZICustomConnection.init_session()
+    session = ZICustomConnection.init_session()
     # failed= ZISettingsHelper.load_settings("normalized/config_phase_amp_pll.json", session, "dev3917")
-    # failed= ZISettingsHelper.load_settings("normalized/pll_opt_preset_fixed_101926.json", session, "dev3917")
+    failed= ZISettingsHelper.load_settings("normalized/pll_opt_preset_fixed_101926.json", session, "dev3917")
 
     # if failed:
     #     print(f"Failed to apply the following settings: {failed}")
@@ -31,9 +31,18 @@ def main():
     
     # optimize using sp optimize
 
-    test_pll_params_lambda = lambda x: ZIOptimize.test_pll_params('mfli-torus.ethz.ch', 8004, "dev3917", P=x[0], I=x[1], D=x[2], F=x[3], BW=x[4], span=10000)
+    # test_pll_params_lambda = lambda x: ZIOptimize.test_pll_params('mfli-torus.ethz.ch', 8004, "dev3917", P=x[0], I=x[1], D=x[2], F=x[3], BW=x[4], span=10000)
 
-    sp.optimize.minimize(test_pll_params_lambda, x0=[1.5, 5.0e3, 1.5/(10.0e3), 0, 1000], method='Nelder-Mead', options={'disp': True})
+    # sp.optimize.minimize(test_pll_params_lambda, x0=[1.5, 5.0e3, 1.5/(10.0e3), 0, 1000], method='Nelder-Mead', options={'disp': True})
+
+    # optimize using optuna
+
+    study = optuna.create_study(direction="minimize", storage="sqlite:///optuna_study.db", study_name="pll_optimization", load_if_exists=True)
+    optuna_objective_lambda = lambda trial: ZIOptimize.optuna_objective(trial, 'mfli-torus.ethz.ch', 8004, "dev3917", span=10000)
+    study.optimize(
+        optuna_objective_lambda,
+        n_trials=100,
+    )
 
 
 if __name__ == "__main__":

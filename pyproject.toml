@@ -9,6 +9,10 @@ authors = [
 requires-python = ">=3.13"
 dependencies = [
     "matplotlib>=3.11.2",
+    "nbformat>=5.11.1",
+    "optuna>=5.0.0",
+    "optuna-dashboard>=0.21.0",
+    "plotly>=7.1.0",
     "rich>=15.0.0",
     "scipy>=1.18.1",
     "tdqm>=0.0.1",
