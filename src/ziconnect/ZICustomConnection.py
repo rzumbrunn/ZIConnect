@@ -1,6 +1,8 @@
 import time
 
 import matplotlib.pyplot as plt
+import numpy as np
+import zhinst.core as zi
 import zhinst.toolkit as tk
 
 
@@ -21,141 +23,175 @@ def init_session(host: str="mfli-torus.ethz.ch"):
     session = tk.Session(host)
     return session
 
+def round_to_nearest_order_of_two(value: float) -> float:
+    if value <= 0:
+        raise ValueError("Value must be positive.")
+    order_of_two = 2 ** round(np.log2(value))
+    return order_of_two
 
-
-def get_raw_phase(session: tk.Session, serial: str, channel: int = 0):
+def get_phase_noise_direct_retry(
+    host: str,
+    port: int,
+    serial: str,
+    retries: int = 5,
+    channel: int = 0,
+    frequency_span: float = 20000,
+    frequency_res: float = 10,
+    plot: bool = True,
+):
     """
-    Retrieves the raw phase of a specified channel from a Zurich Instruments device.
+    get_phase_noise_direct_retry Gets the phase noise from the PLL. If none data is returned, tries again until it works, or until backoff is reached
 
-    Parameters
-    ----------
-    session : zhinst.toolkit.Session
-        An instance of the Session class representing the connection to the LabOne server.
-    serial : str
-        The serial number of the Zurich Instruments device.
-    channel : int
-        The channel number for which to retrieve the raw phase.
-
-    Returns
-    -------
-    float
-        The raw phase value of the specified channel.
+    Args:
+        host (str): LabOne server host.
+        port (int): LabOne server port.
+        serial (str): Device serial number.
+        channel (int, optional): Channel number. Defaults to 0.
+        frequency_span (float, optional): Frequency span. Defaults to 20000.
+        frequency_res (float, optional): Frequency resolution. Defaults to 10.
+        plot (bool, optional): Whether to plot the results. Defaults to True.
     """
-    # daq_module.subscribe('/dev3917/demods/1/sample.Theta.fft.abs.pwr.avg')
+    for attempt in range(retries):
+        try:
+            pn, freqs =  get_phase_noise_direct(
+                host=host,
+                port=port,
+                serial=serial,
+                channel=channel,
+                frequency_span=frequency_span,
+                frequency_res=frequency_res,
+                plot=plot,
+            )
+            if np.isnan(np.sum(pn)):
+                raise ValueError("Received NaN values in phase noise data.")
+            return pn, freqs
 
-def get_phase_noise(session: tk.Session, serial: str, channel: int = 0):
-    """
-    Retrieves the phase noise of a specified channel from a Zurich Instruments device.
-
-    Parameters
-    ----------
-    session : zhinst.toolkit.Session
-        An instance of the Session class representing the connection to the LabOne server.
-    serial : str
-        The serial number of the Zurich Instruments device.
-    channel : int
-        The channel number for which to retrieve the phase noise.
-
-    Returns
-    -------
-    float
-        The phase noise value of the specified channel.
-    """
-    device = session.connect_device(serial)
-
-    daq_module = session.modules.daq
-
-    import numpy as np
-    frequency_span = 20000  # Frequency span in Hz
-    # frequency_res = 0.1   # Frequency resolution bins/Hz
-    frequency_res = 10   # Frequency resolution bins/Hz
-
-    number_of_bins = int(np.pi * frequency_span / frequency_res)
-    duration = 1 / frequency_res  # Duration of the measurement in seconds
-
-    print(f"Number of bins: {number_of_bins}, Duration: {duration} seconds")
-
-    
-
-    with session.set_transaction():  
-        daq_module.device(device)
-        daq_module.type(0) # continuous acquisition
-        daq_module.spectrum.enable(1)
-        daq_module.grid.mode(2)
-        daq_module.grid.repetitions(1)
-
-        daq_module.grid.cols(number_of_bins)  # Number of frequency bins
-        daq_module.duration(duration)  # Duration of the measurement in seconds
-        # for options see: https://docs.zhinst.com/labone_api_user_manual/modules/daq/index.html#spectrum
-        
-
-    daq_module.unsubscribe("*") 
-    device.demods[channel].enable(True)
-    # device.demods[channel].rate(sampling_rate)
+        except ValueError as e:
+            print(f"Attempt {attempt + 1} failed: {e}")
+            if attempt < retries - 1:
+                print("Retrying...")
+            else:
+                print("All attempts failed.")
+                raise
 
 
-    
-    sample_nodes = [
-        # device.demods[channel].sample.x,
-        # device.demods[channel].sample.y,
-        device.demods[channel].sample.phase.fft.abs.pwr.avg,
+
+def get_phase_noise_direct(
+    host: str,
+    port: int,
+    serial: str,
+    channel: int = 0,
+    frequency_span: float = 20000,
+    frequency_res: float = 20,
+    plot: bool = True,
+):
+    daq = zi.ziDAQServer(host, port, 0)
+    daq_module = daq.dataAcquisitionModule()
+
+    subscriptions = [
+        f'/{serial}/demods/{channel}/sample.Theta.fft.abs.pwr.avg'
+
     ]
 
-    for sample_node in sample_nodes:
-        daq_module.subscribe(sample_node)
-
-
-    daq_module.execute()
-
-    while daq_module.progress() < 1.0 and not daq_module.finished():
-        print(f"Progress: {daq_module.progress() * 100:.2f}%", end="\r")
-        time.sleep(0.1)
-        result = daq_module.read(raw=False)
-
-    # print(result)
-
-    # successfull_nodes = [node for node in sample_nodes if node in result]
-    successfull_nodes = []
-    failed_nodes = []
-    for node in sample_nodes:
-        if node in result:
-            successfull_nodes.append(node)
-        else:
-            failed_nodes.append(node)
-
-    for node in failed_nodes:
-        print(f"Failed to retrieve data for node: {node}")
-
-    fig, ax = plt.subplots(1, len(successfull_nodes), figsize=(10, 5))
-    for i, node in enumerate(successfull_nodes):
-        data = result[node]
-
-        timeplot = False
-        freqplot = False
-        if data[0].time is not None:
-            timeplot = True
-            x_value = data[0].time
-        elif data[0].frequency is not None:
-            freqplot = True
-            x_value = data[0].frequency
-
-        values = data[0].value
-
-        if len(successfull_nodes) == 1:
-            ax = [ax]  # Ensure ax is iterable when there's only one subplot
-        ax[i].plot(x_value, values[0])
-        ax[i].set_title(f"Node: {node}")
-        ax[i].set_ylabel("Value")
-        if freqplot:
-            ax[i].set_xlabel("Frequency (Hz)")
-            ax[i].set_yscale("log")\
-            
-
-
-
-    print(f"bin spacing: {np.mean(np.diff(x_value))}")
-    fig.tight_layout()
-    plt.figure()
-    plt.plot(x_value, np.fft.fftshift(np.fft.fft(values[0])))
+    # sampling_rate = daq.get(f"/{serial}/demods/{channel}/rate")
+    sampling_rate = daq.get(f"/{serial}/demods/{channel}/rate")[serial]['demods'][str(channel)]['rate']['value'][0]
     
-    plt.show()
+    # print(sampling_rate)
+
+
+    # Debug
+    # set_bins= 4000 # doubling -> doubles frequency resolution
+    #set_duration =4 #doubling -> literally nothing
+    # set_span = 40000 # doubling -> doubles both resolution and span
+
+    set_bins = round_to_nearest_order_of_two(frequency_span / frequency_res)
+    set_span = frequency_span
+    # print(f"Set bins {set_bins}, Set span {set_span}, Set duration {4}")
+    # print(f"Frequency resolution: {set_span / set_bins} Hz")
+
+
+
+    # print(f"Set bins {set_bins}, Set span {set_span}, Set duration {set_duration}")
+
+    # daq_module.set('preview', 1)
+    daq_module.set('type', 0)
+    daq_module.set('grid/rows', 10)
+    daq_module.set('device', serial)
+    daq_module.set('delay', 0)
+    daq_module.set('spectrum/enable', 1)
+
+    daq_module.set('save/directory', '/data/LabOne/WebServer/phase_noise_data')
+
+    daq_module.set('grid/cols', set_bins)
+    daq_module.set('spectrum/frequencyspan', set_span)
+
+    daq.set(f"/{serial}/demods/{channel}/enable", 1)
+
+
+    daq_module.set('clearhistory', 1)
+    daq_module.set('endless', 0)
+    for sub in subscriptions:
+        daq_module.subscribe(sub)
+    daq_module.execute()
+    result = 0
+    print("Waiting for data...")
+    while daq_module.progress()[0] < 1.0 and not daq_module.finished():
+        time.sleep(1)
+        result = daq_module.read()
+        print(f"Progress: {daq_module.progress()[0] * 100:.2f}%", end="\r")
+    daq_module.finish()
+    daq_module.unsubscribe('*')
+
+    print("Data acquisition finished.")
+    sub_results = {}
+    for sub in subscriptions:
+        try:  
+            current_head = result
+            for path_part in sub.lower().strip('/').split('/'):
+                current_head = current_head[path_part]
+            sub_results[sub] = current_head
+        except KeyError:
+            print(f"Failed to retrieve data for subscription: {sub}")
+
+    # print(sub_results)
+    for sub, data in sub_results.items():
+        for i, d in enumerate(data): # for every datapoint (row)
+
+            #TODO: only works on sample.theta.fft.abs.pwr.avg
+
+            headers = d['header']
+
+            bandwidth = headers['bandwidth']
+            normalized_equivalent_noise_bandwidth = headers['nenbw']   
+            center_frequency = headers['center'] # pre demodulation
+
+            freq_delta = headers['gridcoldelta'][0] # spacing between bins
+            freq_num = headers['gridcols'][0] # number of bins
+            freq_offset = headers['gridcoloffset'][0] #offset of first bin
+
+            freq_range = [
+                freq_offset,    
+                freq_delta * (freq_num-1) + freq_offset,
+            ]
+
+            values = d['value'].T
+            frequencies = np.linspace(freq_range[0], freq_range[1], freq_num)
+
+
+            print("SET")
+            print(f"frequency span: {frequency_span} Hz, frequency res: {frequency_res} Hz") 
+            print("ACTUAL")
+            print(f"frequency span: {freq_range[1] - freq_range[0]} Hz, frequency res: {freq_delta} Hz - Bins {freq_num}") 
+            if plot:
+                plt.figure(figsize=(10, 5))
+                plt.plot(frequencies, values*1e3) # not sure if this is correct. But this qualitatively matches the web ui. For more info see: https://www.zhinst.com/ch/en/blogs/how-control-spectral-leakage-window-functions-labone/ 
+                plt.title(rf"Subscription: {sub} - Data Point {i}: Frequency Resolution: {freq_delta:.2f} Hz - BW: {bandwidth[0]:.2f} Hz ")
+                plt.xlabel("Frequency (Hz)")
+                plt.ylabel("Value")
+                plt.yscale("log")
+                plt.xscale("log")
+                plt.grid()  
+    if plot:
+        plt.show() 
+    # return sub_results  
+    return values, frequencies
