@@ -15,7 +15,7 @@ def main():
     # Initialize standard session with pll
     session = ZICustomConnection.init_session()
     # failed= ZISettingsHelper.load_settings("normalized/config_phase_amp_pll.json", session, "dev3917")
-    failed= ZISettingsHelper.load_settings("normalized/pll_opt_preset_fixed_101926.json", session, "dev3917")
+    failed= ZISettingsHelper.load_settings("normalized/phase_lock_doublepass_102126.json", session, "dev3917")
 
     # if failed:
     #     print(f"Failed to apply the following settings: {failed}")
@@ -37,7 +37,7 @@ def main():
 
     # optimize using optuna
 
-    study = optuna.create_study(direction="minimize", storage="sqlite:///optuna_study.db", study_name="pll_optimization", load_if_exists=True)
+    study = optuna.create_study(direction="minimize", storage="sqlite:///optuna_study.db", study_name="pll_optimization_doublepass_G_opt_new_errfunc_500Hz", load_if_exists=True)
     optuna_objective_lambda = lambda trial: ZIOptimize.optuna_objective(trial, 'mfli-torus.ethz.ch', 8004, "dev3917", span=10000)
     study.optimize(
         optuna_objective_lambda,

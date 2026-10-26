@@ -33,7 +33,7 @@ def get_phase_noise_direct_retry(
     host: str,
     port: int,
     serial: str,
-    retries: int = 5,
+    retries: int = 10,
     channel: int = 0,
     frequency_span: float = 20000,
     frequency_res: float = 10,
@@ -115,7 +115,7 @@ def get_phase_noise_direct(
 
     # daq_module.set('preview', 1)
     daq_module.set('type', 0)
-    daq_module.set('grid/rows', 10)
+    daq_module.set('grid/rows', 5)
     daq_module.set('device', serial)
     daq_module.set('delay', 0)
     daq_module.set('spectrum/enable', 1)
@@ -136,7 +136,7 @@ def get_phase_noise_direct(
     result = 0
     print("Waiting for data...")
     while daq_module.progress()[0] < 1.0 and not daq_module.finished():
-        time.sleep(1)
+        time.sleep(0.1)
         result = daq_module.read()
         print(f"Progress: {daq_module.progress()[0] * 100:.2f}%", end="\r")
     daq_module.finish()

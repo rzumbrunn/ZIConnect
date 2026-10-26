@@ -18,19 +18,53 @@ def optuna_objective(trial, host, port, serial, span):
     # BW0 = 1000
 
     # Trial 2
-    P0 = 14.188084934437933
-    I0 = 42669.089183065145
-    D0 = 0.0014779803568506133
+    # P0 = 14.188084934437933
+    # I0 = 42669.089183065145
+    # D0 = 0.0014779803568506133
+    # F0 = 0
+    # BW0 = 1000
+
+    # Double pass Trial
+    # P0 = 1.5
+    # I0 = 10.0e3
+    # D0 = 1.5 / (20.0e3)
+    # F0 = 0
+    # BW0 = 1000
+
+    # Double pass optimal filter trial (500Hz )
+    P0 = 7.6e6 / (22**2)
+    I0 = 2.5e10/(22**3)
+    D0 = 760 /(22)
     F0 = 0
     BW0 = 1000
 
-    P = trial.suggest_float("P", 1 * P0, 100 * P0)
-    I = trial.suggest_float("I", 0.1 * I0, 100 * I0)
+    # Double pass trial 2
+    # G = trial.suggest_float("G", 0.1, 100)
+    # P = P0 * G
+    # I = I0 * G
+    # D = D0 * G
+    # BW = BW0 * G
+
+    # Double pass trial 3
+    P = trial.suggest_float("P", 0.1 * P0, 10 * P0)
+    I = trial.suggest_float("I", 0.1 * I0, 10 * I0)
     D = trial.suggest_float("D", 0.1 * D0, 10 * D0)
+    BW = trial.suggest_float("BW", 1 * BW0, 10 * BW0)
+
+
+    # Alt trial 2
+    # P = trial.suggest_float("P", 0.5 * P0, 2 * P0)
+    # I = trial.suggest_float("I", 0.5 * I0, 2 * I0)
+    # D = trial.suggest_float("D", 0.5 * D0, 2 * D0)
+
+
+    # P = trial.suggest_float("P", 1 * P0, 100 * P0)
+    # I = trial.suggest_float("I", 0.1 * I0, 100 * I0)
+    # D = trial.suggest_float("D", 0.1 * D0, 10 * D0)
     # F = trial.suggest_float("F", 0.1 * F0, 10 * F0)
     # BW = trial.suggest_float("BW", 0.1 * BW0, 10 * BW0)
     F = 1 * F0  # Keep F fixed for now
-    BW = 1 * BW0  # Keep BW fixed for now
+    # BW = 1 * BW0  # Keep BW fixed for now
 
     score = test_pll_params(host, port, serial, P, I, D, F, BW, span)
     optuna.artifacts.upload_artifact(
@@ -57,7 +91,7 @@ def test_pll_params(host, port, serial, P, I, D, F, BW, span):
         serial=serial,
         channel=2,
         frequency_span=span,
-        frequency_res=10,
+        frequency_res=50,
         plot=False
     )
     pn_no_pll = np.sum(np.array(pn_no_pll), axis=1)  # Sum the two arrays element-wise
@@ -74,7 +108,7 @@ def test_pll_params(host, port, serial, P, I, D, F, BW, span):
 
     # wait for the PLL to stabilize
     print("Waiting for PLL to stabilize...")
-    time.sleep(2)  
+    time.sleep(0.2)  
 
     pn_with_pll, freqs = ZICustomConnection.get_phase_noise_direct_retry(
         host=host,
@@ -82,7 +116,7 @@ def test_pll_params(host, port, serial, P, I, D, F, BW, span):
         serial=serial,
         channel=2,
         frequency_span=span,
-        frequency_res=10,
+        frequency_res=50,
         plot=False
     )
     pn_with_pll = np.sum(np.array(pn_with_pll), axis=1)  # Sum the two arrays element-wise
@@ -99,6 +133,7 @@ def test_pll_params(host, port, serial, P, I, D, F, BW, span):
     plt.tight_layout()
     # plt.show()
     plt.savefig(f"data/phase_noise_comparison_{serial}_P{P}_I{I}_D{D}_F{F}_BW{BW}.png")
+    plt.close()
 
     np.savez(f"data/phase_noise_data_{serial}_P{P}_I{I}_D{D}_F{F}_BW{BW}.npz", freqs=freqs, pn_no_pll=pn_no_pll, pn_with_pll=pn_with_pll)
 
@@ -113,6 +148,7 @@ def test_pll_params(host, port, serial, P, I, D, F, BW, span):
         with_pll_integral = np.trapezoid(pn_with_pll[mask], freqs[mask])
         without_pll_integral = np.trapezoid(pn_no_pll[mask], freqs[mask])
 
-        return with_pll_integral /   without_pll_integral  # The smaller the ratio, the better the PLL performance
+        # return with_pll_integral /   without_pll_integral  # The smaller the ratio, the better the PLL performance
+        return with_pll_integral  # The smaller the integral, the better the PLL performance
 
     return scoring_function(freqs, pn_no_pll, pn_with_pll)
