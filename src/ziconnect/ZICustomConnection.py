@@ -5,8 +5,14 @@ import numpy as np
 import zhinst.core as zi
 import zhinst.toolkit as tk
 
+from ziconnect.settings import API_LEVEL
 
-def init_session(host: str="mfli-torus.ethz.ch"):
+
+class LabOneConnectionError(ConnectionError):
+    """Raised when the LabOne server cannot be reached on the requested port."""
+
+
+def init_session(host: str="mfli-torus.ethz.ch", port: int=8004) -> tk.Session:
     """
     Initializes a session to the Zurich Instruments LabOne server.
 
@@ -20,7 +26,23 @@ def init_session(host: str="mfli-torus.ethz.ch"):
     session : zhinst.toolkit.Session
         An instance of the Session class representing the connection to the LabOne server.
     """
-    session = tk.Session(host)
+    try:   
+        session = tk.Session(host, port)
+    except Exception as e:
+        # ping the host to check if it's reachable
+        import subprocess
+        success = False
+        try:
+            subprocess.check_call(["ping", "-c", "1", host])
+            success = True
+        except subprocess.CalledProcessError:
+            raise ConnectionError(f"Cannot reach host {host}. Please check the hostname and your network connection.") from e
+        if success:
+            raise LabOneConnectionError(
+                f"The host {host} is reachable, but the LabOne server could not be connected to "
+                f"on port {port}. Please check that the LabOne server is running."
+            ) from e
+    # dev1 = session.connect_device("DEV1234")
     return session
 
 def round_to_nearest_order_of_two(value: float) -> float:
@@ -37,6 +59,7 @@ def get_phase_noise_direct_retry(
     channel: int = 0,
     frequency_span: float = 20000,
     frequency_res: float = 10,
+    no_samples: int = 10,
     plot: bool = True,
 ):
     """
@@ -60,7 +83,8 @@ def get_phase_noise_direct_retry(
                 channel=channel,
                 frequency_span=frequency_span,
                 frequency_res=frequency_res,
-                plot=plot,
+                no_samples=no_samples,
+                plot=plot, 
             )
             if np.isnan(np.sum(pn)):
                 raise ValueError("Received NaN values in phase noise data.")
@@ -82,10 +106,11 @@ def get_phase_noise_direct(
     serial: str,
     channel: int = 0,
     frequency_span: float = 20000,
-    frequency_res: float = 20,
+    frequency_res: float = 50,
+    no_samples: int = 10,
     plot: bool = True,
 ):
-    daq = zi.ziDAQServer(host, port, 0)
+    daq = zi.ziDAQServer(host, port, api_level=API_LEVEL)
     daq_module = daq.dataAcquisitionModule()
 
     subscriptions = [
@@ -175,6 +200,7 @@ def get_phase_noise_direct(
             ]
 
             values = d['value'].T
+            mean_values = np.mean(values, axis=1)
             frequencies = np.linspace(freq_range[0], freq_range[1], freq_num)
 
 
@@ -184,7 +210,8 @@ def get_phase_noise_direct(
             print(f"frequency span: {freq_range[1] - freq_range[0]} Hz, frequency res: {freq_delta} Hz - Bins {freq_num}") 
             if plot:
                 plt.figure(figsize=(10, 5))
-                plt.plot(frequencies, values*1e3) # not sure if this is correct. But this qualitatively matches the web ui. For more info see: https://www.zhinst.com/ch/en/blogs/how-control-spectral-leakage-window-functions-labone/ 
+                plt.plot(frequencies, values, alpha=0.4) # not sure if this is correct. But this qualitatively matches the web ui. For more info see: https://www.zhinst.com/ch/en/blogs/how-control-spectral-leakage-window-functions-labone/ 
+                plt.plot(frequencies, mean_values, color='black', linewidth=2, label='Mean')
                 plt.title(rf"Subscription: {sub} - Data Point {i}: Frequency Resolution: {freq_delta:.2f} Hz - BW: {bandwidth[0]:.2f} Hz ")
                 plt.xlabel("Frequency (Hz)")
                 plt.ylabel("Value")
@@ -194,4 +221,4 @@ def get_phase_noise_direct(
     if plot:
         plt.show() 
     # return sub_results  
-    return values, frequencies
+    return mean_values, frequencies

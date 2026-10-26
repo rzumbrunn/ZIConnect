@@ -1,0 +1,897 @@
+{
+  "settings": {
+    "deviceSettings": [
+      {
+        "deviceSerial": "dev13087",
+        "deviceType": "VHFLI",
+        "nodes": {
+          "au": {
+            "amplitudes": {
+              "ch0": {
+                "scalings": {
+                  "ch0": "1",
+                  "ch1": "-1"
+                },
+                "sources": {
+                  "ch0": {
+                    "channel": "0",
+                    "select": "-1"
+                  },
+                  "ch1": {
+                    "channel": "0",
+                    "select": "-1"
+                  },
+                  "ch2": {
+                    "channel": "0",
+                    "select": "-1"
+                  },
+                  "ch3": {
+                    "channel": "0",
+                    "select": "-1"
+                  }
+                }
+              },
+              "ch1": {
+                "scalings": {
+                  "ch0": "1",
+                  "ch1": "-1"
+                },
+                "sources": {
+                  "ch0": {
+                    "channel": "0",
+                    "select": "-1"
+                  },
+                  "ch1": {
+                    "channel": "0",
+                    "select": "-1"
+                  },
+                  "ch2": {
+                    "channel": "0",
+                    "select": "-1"
+                  },
+                  "ch3": {
+                    "channel": "0",
+                    "select": "-1"
+                  }
+                }
+              },
+              "ch2": {
+                "scalings": {
+                  "ch0": "1",
+                  "ch1": "-1"
+                },
+                "sources": {
+                  "ch0": {
+                    "channel": "0",
+                    "select": "-1"
+                  },
+                  "ch1": {
+                    "channel": "0",
+                    "select": "-1"
+                  },
+                  "ch2": {
+                    "channel": "0",
+                    "select": "-1"
+                  },
+                  "ch3": {
+                    "channel": "0",
+                    "select": "-1"
+                  }
+                }
+              },
+              "ch3": {
+                "scalings": {
+                  "ch0": "1",
+                  "ch1": "-1"
+                },
+                "sources": {
+                  "ch0": {
+                    "channel": "0",
+                    "select": "-1"
+                  },
+                  "ch1": {
+                    "channel": "0",
+                    "select": "-1"
+                  },
+                  "ch2": {
+                    "channel": "0",
+                    "select": "-1"
+                  },
+                  "ch3": {
+                    "channel": "0",
+                    "select": "-1"
+                  }
+                }
+              }
+            },
+            "phases": {
+              "ch0": {
+                "scalings": {
+                  "ch0": "0",
+                  "ch1": "0",
+                  "ch2": "0"
+                },
+                "sources": {
+                  "ch0": {
+                    "channel": "0"
+                  },
+                  "ch1": {
+                    "channel": "1"
+                  },
+                  "ch2": {
+                    "channel": "2"
+                  }
+                }
+              },
+              "ch1": {
+                "scalings": {
+                  "ch0": "0",
+                  "ch1": "0",
+                  "ch2": "0"
+                },
+                "sources": {
+                  "ch0": {
+                    "channel": "4"
+                  },
+                  "ch1": {
+                    "channel": "5"
+                  },
+                  "ch2": {
+                    "channel": "6"
+                  }
+                }
+              }
+            }
+          },
+          "auxins": {
+            "ch0": {
+              "delaycompensation": {
+                "delay": "1.9350000002305023e-07"
+              },
+              "on": "1",
+              "range": "1"
+            },
+            "ch1": {
+              "delaycompensation": {
+                "delay": "1.9350000002305023e-07"
+              },
+              "on": "1",
+              "range": "1"
+            }
+          },
+          "auxouts": {
+            "ch0": {
+              "limitlower": "-10",
+              "limitupper": "10",
+              "offset": "0",
+              "outputchannel": "0",
+              "outputselect": "-1",
+              "preoffset": "0",
+              "range": "0.10000000149011612",
+              "scale": "0"
+            },
+            "ch1": {
+              "limitlower": "-10",
+              "limitupper": "10",
+              "offset": "0",
+              "outputchannel": "0",
+              "outputselect": "-1",
+              "preoffset": "0",
+              "range": "0.10000000149011612",
+              "scale": "0"
+            },
+            "ch2": {
+              "limitlower": "-10",
+              "limitupper": "10",
+              "offset": "0",
+              "outputchannel": "0",
+              "outputselect": "-1",
+              "preoffset": "0",
+              "range": "0.10000000149011612",
+              "scale": "0"
+            },
+            "ch3": {
+              "limitlower": "-10",
+              "limitupper": "10",
+              "offset": "0",
+              "outputchannel": "0",
+              "outputselect": "-1",
+              "preoffset": "0",
+              "range": "0.10000000149011612",
+              "scale": "0"
+            }
+          },
+          "currins": {
+            "ch0": {
+              "delaycompensation": {
+                "delay": "1.9350000002305023e-07"
+              },
+              "on": "1",
+              "range": "0.0099999997764825821"
+            },
+            "ch1": {
+              "delaycompensation": {
+                "delay": "1.9350000002305023e-07"
+              },
+              "on": "1",
+              "range": "0.0099999997764825821"
+            }
+          },
+          "demods": {
+            "ch0": {
+              "adcselect": "0",
+              "burstlen": "1",
+              "bypass": "0",
+              "enable": "0",
+              "harmonic": "1",
+              "order": "3",
+              "oscselect": "0",
+              "phaseshift": "0",
+              "rate": "762.939453125",
+              "timeconstant": "0.00087380333570763469",
+              "trigger": {
+                "delay": "0",
+                "mode": "1",
+                "source": "0",
+                "triggeracq": "0"
+              }
+            },
+            "ch1": {
+              "adcselect": "0",
+              "burstlen": "1",
+              "bypass": "0",
+              "enable": "0",
+              "harmonic": "1",
+              "order": "4",
+              "oscselect": "1",
+              "phaseshift": "0",
+              "rate": "195312.5",
+              "timeconstant": "3.4620961741893552e-06",
+              "trigger": {
+                "delay": "0",
+                "mode": "1",
+                "source": "0",
+                "triggeracq": "0"
+              }
+            },
+            "ch2": {
+              "adcselect": "0",
+              "burstlen": "1",
+              "bypass": "0",
+              "enable": "1",
+              "harmonic": "1",
+              "order": "3",
+              "oscselect": "1",
+              "phaseshift": "0",
+              "rate": "390625",
+              "timeconstant": "1.8752321011561435e-06",
+              "trigger": {
+                "delay": "0",
+                "mode": "1",
+                "source": "0",
+                "triggeracq": "0"
+              }
+            },
+            "ch3": {
+              "adcselect": "0",
+              "burstlen": "1",
+              "bypass": "0",
+              "enable": "0",
+              "harmonic": "1",
+              "order": "3",
+              "oscselect": "0",
+              "phaseshift": "0",
+              "rate": "762.939453125",
+              "timeconstant": "0.00087380333570763469",
+              "trigger": {
+                "delay": "0",
+                "mode": "1",
+                "source": "0",
+                "triggeracq": "0"
+              }
+            },
+            "ch4": {
+              "adcselect": "1",
+              "burstlen": "1",
+              "bypass": "0",
+              "enable": "0",
+              "harmonic": "1",
+              "order": "3",
+              "oscselect": "1",
+              "phaseshift": "0",
+              "rate": "762.939453125",
+              "timeconstant": "0.00087380333570763469",
+              "trigger": {
+                "delay": "0",
+                "mode": "1",
+                "source": "0",
+                "triggeracq": "0"
+              }
+            },
+            "ch5": {
+              "adcselect": "1",
+              "burstlen": "1",
+              "bypass": "0",
+              "enable": "0",
+              "harmonic": "1",
+              "order": "3",
+              "oscselect": "1",
+              "phaseshift": "0",
+              "rate": "762.939453125",
+              "timeconstant": "0.00087380333570763469",
+              "trigger": {
+                "delay": "0",
+                "mode": "1",
+                "source": "0",
+                "triggeracq": "0"
+              }
+            },
+            "ch6": {
+              "adcselect": "1",
+              "burstlen": "1",
+              "bypass": "0",
+              "enable": "0",
+              "harmonic": "1",
+              "order": "3",
+              "oscselect": "1",
+              "phaseshift": "0",
+              "rate": "762.939453125",
+              "timeconstant": "0.00087380333570763469",
+              "trigger": {
+                "delay": "0",
+                "mode": "1",
+                "source": "0",
+                "triggeracq": "0"
+              }
+            },
+            "ch7": {
+              "adcselect": "1",
+              "burstlen": "1",
+              "bypass": "0",
+              "enable": "0",
+              "harmonic": "1",
+              "order": "3",
+              "oscselect": "1",
+              "phaseshift": "0",
+              "rate": "762.939453125",
+              "timeconstant": "0.00087380333570763469",
+              "trigger": {
+                "delay": "0",
+                "mode": "1",
+                "source": "0",
+                "triggeracq": "0"
+              }
+            }
+          },
+          "extrefs": {
+            "ch0": {
+              "automode": "4",
+              "enable": "0"
+            },
+            "ch1": {
+              "automode": "4",
+              "enable": "0"
+            }
+          },
+          "generators": {
+            "ch0": {
+              "harmonic": "1",
+              "oscselect": "0",
+              "phaseshift": "0"
+            },
+            "ch1": {
+              "harmonic": "1",
+              "oscselect": "0",
+              "phaseshift": "0"
+            },
+            "ch2": {
+              "harmonic": "1",
+              "oscselect": "0",
+              "phaseshift": "0"
+            },
+            "ch3": {
+              "harmonic": "1",
+              "oscselect": "0",
+              "phaseshift": "0"
+            },
+            "ch4": {
+              "harmonic": "1",
+              "oscselect": "1",
+              "phaseshift": "0"
+            },
+            "ch5": {
+              "harmonic": "1",
+              "oscselect": "1",
+              "phaseshift": "0"
+            },
+            "ch6": {
+              "harmonic": "1",
+              "oscselect": "1",
+              "phaseshift": "0"
+            },
+            "ch7": {
+              "harmonic": "1",
+              "oscselect": "1",
+              "phaseshift": "0"
+            }
+          },
+          "mods": {
+            "ch0": {
+              "carrier": {
+                "amplitude": "0.10000000149011612",
+                "enable": "0",
+                "harmonic": "1",
+                "inputselect": "0",
+                "order": "3",
+                "oscselect": "0",
+                "phaseshift": "0",
+                "timeconstant": "0.00087380333570763469"
+              },
+              "enable": "0",
+              "freqdev": "0",
+              "freqdevenable": "0",
+              "index": "0.10000000149011612",
+              "mode": "0",
+              "output": "1",
+              "sidebands": {
+                "ch0": {
+                  "amplitude": "0.004999999888241291",
+                  "enable": "0",
+                  "harmonic": "1",
+                  "inputselect": "0",
+                  "mode": "1",
+                  "order": "3",
+                  "oscselect": "1",
+                  "phaseshift": "0",
+                  "timeconstant": "0.00087380333570763469"
+                },
+                "ch1": {
+                  "amplitude": "0.004999999888241291",
+                  "enable": "0",
+                  "harmonic": "1",
+                  "inputselect": "0",
+                  "mode": "2",
+                  "order": "3",
+                  "oscselect": "1",
+                  "phaseshift": "0",
+                  "timeconstant": "0.00087380333570763469"
+                }
+              }
+            },
+            "ch1": {
+              "carrier": {
+                "amplitude": "0.10000000149011612",
+                "enable": "0",
+                "harmonic": "1",
+                "inputselect": "1",
+                "order": "3",
+                "oscselect": "6",
+                "phaseshift": "0",
+                "timeconstant": "0.00087380333570763469"
+              },
+              "enable": "0",
+              "freqdev": "0",
+              "freqdevenable": "0",
+              "index": "0.10000000149011612",
+              "mode": "0",
+              "output": "2",
+              "sidebands": {
+                "ch0": {
+                  "amplitude": "0.004999999888241291",
+                  "enable": "0",
+                  "harmonic": "1",
+                  "inputselect": "1",
+                  "mode": "1",
+                  "order": "3",
+                  "oscselect": "7",
+                  "phaseshift": "0",
+                  "timeconstant": "0.00087380333570763469"
+                },
+                "ch1": {
+                  "amplitude": "0.004999999888241291",
+                  "enable": "0",
+                  "harmonic": "1",
+                  "inputselect": "1",
+                  "mode": "2",
+                  "order": "3",
+                  "oscselect": "7",
+                  "phaseshift": "0",
+                  "timeconstant": "0.00087380333570763469"
+                }
+              }
+            }
+          },
+          "oscs": {
+            "ch0": {
+              "freq": "80000049.822217524"
+            },
+            "ch1": {
+              "freq": "159999999.99999657"
+            },
+            "ch2": {
+              "freq": "9999999.9999980088"
+            },
+            "ch3": {
+              "freq": "9999999.9999980088"
+            },
+            "ch4": {
+              "freq": "9999999.9999980088"
+            },
+            "ch5": {
+              "freq": "9999999.9999980088"
+            },
+            "ch6": {
+              "freq": "9999999.9999980088"
+            },
+            "ch7": {
+              "freq": "9999999.9999980088"
+            }
+          },
+          "pids": {
+            "ch0": {
+              "center": "80000000",
+              "d": "0.001500000013038516",
+              "demod": {
+                "harmonic": "1",
+                "order": "4",
+                "timeconstant": "3.4620961741893552e-06"
+              },
+              "dlimittimeconstant": "0",
+              "enable": "0",
+              "i": "3250000",
+              "input": "3",
+              "inputchannel": "1",
+              "keepint": "0",
+              "limitlower": "-1000",
+              "limitupper": "1000",
+              "mode": "0",
+              "output": "2",
+              "outputchannel": "0",
+              "p": "200",
+              "phaseunwrap": "1",
+              "pll": {
+                "automode": "0"
+              },
+              "rate": "25000000",
+              "setpoint": "0.10000000149011612",
+              "stream": {
+                "burstlen": "1",
+                "enable": "1",
+                "rate": "762.939453125",
+                "trigger": {
+                  "delay": "0",
+                  "mode": "1",
+                  "source": "0",
+                  "triggeracq": "0"
+                }
+              }
+            },
+            "ch1": {
+              "center": "0.10000000000000001",
+              "d": "0.0010000000474974513",
+              "demod": {
+                "harmonic": "1",
+                "order": "4",
+                "timeconstant": "3.186999947502045e-06"
+              },
+              "dlimittimeconstant": "0",
+              "enable": "0",
+              "i": "10",
+              "input": "0",
+              "inputchannel": "7",
+              "keepint": "0",
+              "limitlower": "-0.5",
+              "limitupper": "0.5",
+              "mode": "0",
+              "output": "1",
+              "outputchannel": "7",
+              "p": "1",
+              "phaseunwrap": "0",
+              "pll": {
+                "automode": "0"
+              },
+              "rate": "25000000",
+              "setpoint": "0.10000000149011612",
+              "stream": {
+                "burstlen": "1",
+                "enable": "1",
+                "rate": "762.939453125",
+                "trigger": {
+                  "delay": "0",
+                  "mode": "1",
+                  "source": "0",
+                  "triggeracq": "0"
+                }
+              }
+            },
+            "ch2": {
+              "center": "0.024999994412064463",
+              "d": "0.0010000000474974513",
+              "demod": {
+                "harmonic": "1",
+                "order": "4",
+                "timeconstant": "3.186999947502045e-06"
+              },
+              "dlimittimeconstant": "0",
+              "enable": "0",
+              "i": "10",
+              "input": "0",
+              "inputchannel": "3",
+              "keepint": "0",
+              "limitlower": "-0.5",
+              "limitupper": "0.5",
+              "mode": "0",
+              "output": "0",
+              "outputchannel": "3",
+              "p": "1",
+              "phaseunwrap": "0",
+              "pll": {
+                "automode": "0"
+              },
+              "rate": "25000000",
+              "setpoint": "0.10000000149011612",
+              "stream": {
+                "burstlen": "1",
+                "enable": "1",
+                "rate": "762.939453125",
+                "trigger": {
+                  "delay": "0",
+                  "mode": "1",
+                  "source": "0",
+                  "triggeracq": "0"
+                }
+              }
+            },
+            "ch3": {
+              "center": "0.10000000000000001",
+              "d": "0.0010000000474974513",
+              "demod": {
+                "harmonic": "1",
+                "order": "4",
+                "timeconstant": "3.186999947502045e-06"
+              },
+              "dlimittimeconstant": "0",
+              "enable": "0",
+              "i": "10",
+              "input": "0",
+              "inputchannel": "7",
+              "keepint": "0",
+              "limitlower": "-0.5",
+              "limitupper": "0.5",
+              "mode": "0",
+              "output": "1",
+              "outputchannel": "7",
+              "p": "1",
+              "phaseunwrap": "0",
+              "pll": {
+                "automode": "0"
+              },
+              "rate": "25000000",
+              "setpoint": "0.10000000149011612",
+              "stream": {
+                "burstlen": "1",
+                "enable": "1",
+                "rate": "762.939453125",
+                "trigger": {
+                  "delay": "0",
+                  "mode": "1",
+                  "source": "0",
+                  "triggeracq": "0"
+                }
+              }
+            }
+          },
+          "reftriggens": {
+            "ch0": {
+              "dutycycle": "0.50000005960464478",
+              "harmonic": "1",
+              "oscselect": "0",
+              "phaseshift": "0"
+            },
+            "ch1": {
+              "dutycycle": "0.50000005960464478",
+              "harmonic": "1",
+              "oscselect": "1",
+              "phaseshift": "0"
+            }
+          },
+          "scopes": {
+            "ch0": {
+              "averaging": {
+                "count": "1",
+                "enable": "0"
+              },
+              "channels": {
+                "ch0": {
+                  "enable": "1",
+                  "inputselect": "0"
+                },
+                "ch1": {
+                  "enable": "0",
+                  "inputselect": "0"
+                }
+              },
+              "enable": "0",
+              "holdoff": "0.20000000298023224",
+              "length": "4992",
+              "rate": "2000000000",
+              "segments": {
+                "count": "1",
+                "enable": "0"
+              },
+              "single": "0",
+              "trigger": {
+                "channel": "0",
+                "delay": "0",
+                "edge": "1",
+                "enable": "0",
+                "hysteresis": "0",
+                "level": "0"
+              }
+            }
+          },
+          "sigins": {
+            "ch0": {
+              "ac": "0",
+              "delaycompensation": {
+                "delay": "1.9350000002305023e-07"
+              },
+              "diff": "0",
+              "imp50": "1",
+              "on": "1",
+              "range": "2"
+            },
+            "ch1": {
+              "ac": "0",
+              "delaycompensation": {
+                "delay": "1.9350000002305023e-07"
+              },
+              "diff": "0",
+              "imp50": "0",
+              "on": "1",
+              "range": "1"
+            }
+          },
+          "sigouts": {
+            "ch0": {
+              "auxinadd": {
+                "enable": "0",
+                "gain": "1.000001072883606"
+              },
+              "diff": "0",
+              "generators": {
+                "ch0": {
+                  "amplitude": "0.025001907721161842",
+                  "enable": "0"
+                },
+                "ch1": {
+                  "amplitude": "0.025001907721161842",
+                  "enable": "0"
+                },
+                "ch2": {
+                  "amplitude": "0.025001907721161842",
+                  "enable": "0"
+                },
+                "ch3": {
+                  "amplitude": "0.10000000149011612",
+                  "enable": "1"
+                },
+                "ch4": {
+                  "amplitude": "0.025001907721161842",
+                  "enable": "0"
+                },
+                "ch5": {
+                  "amplitude": "0.025001907721161842",
+                  "enable": "0"
+                },
+                "ch6": {
+                  "amplitude": "0.025001907721161842",
+                  "enable": "0"
+                },
+                "ch7": {
+                  "amplitude": "0.025001907721161842",
+                  "enable": "0"
+                }
+              },
+              "imp50": "1",
+              "offset": "0",
+              "on": "1",
+              "range": "0.25"
+            },
+            "ch1": {
+              "auxinadd": {
+                "enable": "0",
+                "gain": "0.99999821186065674"
+              },
+              "diff": "0",
+              "generators": {
+                "ch0": {
+                  "amplitude": "0.10000000149011612",
+                  "enable": "0"
+                },
+                "ch1": {
+                  "amplitude": "0.10000000149011612",
+                  "enable": "0"
+                },
+                "ch2": {
+                  "amplitude": "0.10000000149011612",
+                  "enable": "0"
+                },
+                "ch3": {
+                  "amplitude": "0.10000000149011612",
+                  "enable": "0"
+                },
+                "ch4": {
+                  "amplitude": "0.10000000149011612",
+                  "enable": "0"
+                },
+                "ch5": {
+                  "amplitude": "0.10000000149011612",
+                  "enable": "0"
+                },
+                "ch6": {
+                  "amplitude": "0.10000000149011612",
+                  "enable": "0"
+                },
+                "ch7": {
+                  "amplitude": "0.10000000149011612",
+                  "enable": "1"
+                }
+              },
+              "imp50": "0",
+              "offset": "0",
+              "on": "0",
+              "range": "0.5"
+            }
+          },
+          "system": {
+            "clocks": {
+              "referenceclock": {
+                "in": {
+                  "source": "0"
+                },
+                "out": {
+                  "enable": "0",
+                  "freq": "100000000"
+                }
+              }
+            }
+          },
+          "trigins": {
+            "ch0": {
+              "imp50": "0",
+              "level": "0"
+            },
+            "ch1": {
+              "imp50": "0",
+              "level": "0"
+            }
+          },
+          "trigouts": {
+            "ch0": {
+              "on": "0",
+              "source": "80"
+            },
+            "ch1": {
+              "on": "0",
+              "source": "81"
+            }
+          }
+        },
+        "options": [
+          "AWG",
+          "F200M",
+          "MD",
+          "MOD",
+          "PID"
+        ]
+      }
+    ],
+    "format": "6",
+    "head": {
+      "fullVersion": "26.7.2.5",
+      "revision": "2",
+      "version": "26.7"
+    }
+  }
+}

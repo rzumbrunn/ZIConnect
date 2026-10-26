@@ -47,7 +47,10 @@ def load_settings(path: os.PathLike|str, session: tk.Session, serial: str, no_co
     with open(path) as f:
         dev = json.load(f)["settings"]["deviceSettings"][0]
 
+    # assert dev["serial"] == serial, f"Serial number in settings file ({dev['serial']}) does not match the provided serial number ({serial})."
+
     items = [(f"/{serial}{p}", to_number(v)) for p, v in flatten(dev["nodes"])]
+
     # heuristic: apply enables/outputs last so everything is configured first
     items.sort(key=lambda kv: kv[0].rsplit("/", 1)[-1] in ("enable", "on", "enables"))
 
@@ -64,13 +67,17 @@ def load_settings(path: os.PathLike|str, session: tk.Session, serial: str, no_co
                     changed.append((p, v))
                     old.append((p, got))
             except Exception:
+                print(f"Failed to get value for {p}, assuming it is new.")
                 changed.append((p, v))
+                old.append((p, "N/A"))
 
         console = Console()
         changed_table = Table(title="Settings to apply", show_lines=True)
         changed_table.add_column("Path", style="cyan", no_wrap=True)
         changed_table.add_column("Old Value", style="red")
         changed_table.add_column("New Value", style="green")
+
+        assert len(changed) == len(old), f"Changed and old lists must have the same length, but got {len(changed)} and {len(old)}"
         for p, v in changed:
             changed_table.add_row(p,  str(old[changed.index((p, v))][1]), str(v))
         console.print(changed_table)

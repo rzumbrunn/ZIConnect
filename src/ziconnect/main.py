@@ -1,9 +1,8 @@
 import os
 
-import optuna
+from ziconnect import ZICustomConnection, ZISettingsHelper
 
-from ziconnect import ZICustomConnection, ZIOptimize, ZISettingsHelper
-
+SERIAL = "dev13087"
 
 def main():
 

@@ -6,6 +6,7 @@ import optuna
 import zhinst.core as zi
 
 from ziconnect import ZICustomConnection
+from ziconnect.settings import API_LEVEL
 
 artifact_store = optuna.artifacts.FileSystemArtifactStore("data/artifacts")
 
@@ -78,7 +79,7 @@ def optuna_objective(trial, host, port, serial, span):
 
 def test_pll_params(host, port, serial, P, I, D, F, BW, span):
 
-    daq = zi.ziDAQServer(host, port, 0)
+    daq = zi.ziDAQServer(host, port, api_level=API_LEVEL)
     daq_module = daq.dataAcquisitionModule()
 
     # turn off PLL

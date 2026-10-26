@@ -3,3 +3,4 @@
 """
 
 CONFIG_BASE_PATH = "config"
+API_LEVEL = 6
