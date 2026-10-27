@@ -2,10 +2,7 @@ import time
 
 import matplotlib.pyplot as plt
 import numpy as np
-import zhinst.core as zi
 import zhinst.toolkit as tk
-
-from ziconnect.settings import API_LEVEL
 
 
 class LabOneConnectionError(ConnectionError):
@@ -99,7 +96,6 @@ def get_phase_noise_direct_retry(
                 raise
 
 
-
 def get_phase_noise_direct(
     host: str,
     port: int,
@@ -110,71 +106,53 @@ def get_phase_noise_direct(
     no_samples: int = 10,
     plot: bool = True,
 ):
-    daq = zi.ziDAQServer(host, port, api_level=API_LEVEL)
-    daq_module = daq.dataAcquisitionModule()
+    session = init_session(host, port)
+    daq_module = session.modules.daq
+    daq_module.grid.mode(4) # 0 off, 1 nearest, 2, linear, 3 exact, 4 magic????
+    daq_module.type(0)
+    daq_module.preview(1)
+    daq_module.grid.rows(10)
+    daq_module.grid.rowrepetition(1)
+    daq_module.grid.waterfall(1)
+    daq_module.grid.overwrite(1)
+    daq_module.device(serial)
+    daq_module.historylength(1)
+    daq_module.delay(0)
+    daq_module.spectrum.enable(1)
+    daq_module.spectrum.frequencyspan(frequency_span *(2/np.pi)*2) # works well for X,Y and xiy, but not for theta
+    daq_module.spectrum.autobandwidth(1)
+    session.devices[serial].demods[channel].timeconstant(1.0 / (2 * np.pi * 2 * frequency_span)) # adjust filter time constant to match the aquisition bandwidth f_3db = (1/(2*pi * tau))
+    daq_module.grid.cols(round_to_nearest_order_of_two(2*frequency_span / frequency_res))
+    daq_module.save.directory('/root/Zurich Instruments/LabOne/WebServer')
+    daq_module.endless(0)
 
     subscriptions = [
         f'/{serial}/demods/{channel}/sample.Theta.fft.abs.pwr.avg'
-
-    ]
-
-    # sampling_rate = daq.get(f"/{serial}/demods/{channel}/rate")
-    sampling_rate = daq.get(f"/{serial}/demods/{channel}/rate")[serial]['demods'][str(channel)]['rate']['value'][0]
-    
-    # print(sampling_rate)
-
-
-    # Debug
-    # set_bins= 4000 # doubling -> doubles frequency resolution
-    #set_duration =4 #doubling -> literally nothing
-    # set_span = 40000 # doubling -> doubles both resolution and span
-
-    set_bins = round_to_nearest_order_of_two(frequency_span / frequency_res)
-    set_span = frequency_span
-    # print(f"Set bins {set_bins}, Set span {set_span}, Set duration {4}")
-    # print(f"Frequency resolution: {set_span / set_bins} Hz")
-
-
-
-    # print(f"Set bins {set_bins}, Set span {set_span}, Set duration {set_duration}")
-
-    # daq_module.set('preview', 1)
-    daq_module.set('type', 0)
-    daq_module.set('grid/rows', 5)
-    daq_module.set('device', serial)
-    daq_module.set('delay', 0)
-    daq_module.set('spectrum/enable', 1)
-
-    daq_module.set('save/directory', '/data/LabOne/WebServer/phase_noise_data')
-
-    daq_module.set('grid/cols', set_bins)
-    daq_module.set('spectrum/frequencyspan', set_span)
-
-    daq.set(f"/{serial}/demods/{channel}/enable", 1)
-
-
-    daq_module.set('clearhistory', 1)
-    daq_module.set('endless', 0)
+        # f'/{serial}/demods/{channel}/sample.xiy.fft.abs.pwr.avg'
+        # f'/{serial}/demods/{channel}/sample.Y.fft.abs.pwr.avg'
+    ] 
     for sub in subscriptions:
         daq_module.subscribe(sub)
+    
     daq_module.execute()
     result = 0
-    print("Waiting for data...")
-    while daq_module.progress()[0] < 1.0 and not daq_module.finished():
-        time.sleep(0.1)
+    while daq_module.progress() < 1.0 and not daq_module.finished():
+        time.sleep(1)
         result = daq_module.read()
-        print(f"Progress: {daq_module.progress()[0] * 100:.2f}%", end="\r")
+        print(f"Progress {float(daq_module.progress()) * 100:.2f} %\r")
     daq_module.finish()
     daq_module.unsubscribe('*')
-
     print("Data acquisition finished.")
+
+
     sub_results = {}
     for sub in subscriptions:
+    
         try:  
-            current_head = result
-            for path_part in sub.lower().strip('/').split('/'):
-                current_head = current_head[path_part]
-            sub_results[sub] = current_head
+            # VHFLI also has triggered data so we first need to remove it for now
+            if "/triggered" in sub:
+                continue
+            sub_results[sub] = result[sub.lower()]
         except KeyError:
             print(f"Failed to retrieve data for subscription: {sub}")
 
@@ -184,24 +162,25 @@ def get_phase_noise_direct(
 
             #TODO: only works on sample.theta.fft.abs.pwr.avg
 
-            headers = d['header']
+            headers = d.header
 
             bandwidth = headers['bandwidth']
             normalized_equivalent_noise_bandwidth = headers['nenbw']   
+            print(f"Bandwidth: {bandwidth[0]} Hz, Normalized Equivalent Noise Bandwidth: {normalized_equivalent_noise_bandwidth[0]} Hz")
             center_frequency = headers['center'] # pre demodulation
 
-            freq_delta = headers['gridcoldelta'][0] # spacing between bins
             freq_num = headers['gridcols'][0] # number of bins
-            freq_offset = headers['gridcoloffset'][0] #offset of first bin
 
-            freq_range = [
-                freq_offset,    
-                freq_delta * (freq_num-1) + freq_offset,
-            ]
 
-            values = d['value'].T
+            values = d.value.T # for theta, that value is in rad^2/Hz
+            values = values * (180 / np.pi) ** 2 # convert to deg^2/Hz, as in LabOne
             mean_values = np.mean(values, axis=1)
-            frequencies = np.linspace(freq_range[0], freq_range[1], freq_num)
+            frequencies = d.frequency
+            freq_range = [
+                frequencies[0],    
+                frequencies[-1],
+            ]
+            freq_delta = frequencies[1] - frequencies[0]
 
 
             print("SET")
