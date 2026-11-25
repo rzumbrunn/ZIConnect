@@ -17,6 +17,7 @@ Output layout (one folder per acquisition):
 
 import json
 import math
+import os
 import time
 from datetime import datetime
 from pathlib import Path
@@ -107,7 +108,6 @@ def acquire_power(
         clockbase=clockbase,
     )
     (run_dir / "meta.json").write_text(json.dumps(meta, indent=2))
-
     # --- scope configuration ----------------------------------------------------------
     with device.set_transaction():
         scope_node.enable(0)
@@ -186,29 +186,110 @@ def acquire_power(
     return run_dir
 
 
-def load_samples(run_dir: str | Path):
+def load_samples(run_dir: str | Path, num_samples: int | None = None) -> tuple[dict, list[np.ndarray]]:
     """Load all saved samples of one acquisition. Returns (meta, list_of_waves)."""
     run_dir = Path(run_dir)
     meta = json.loads((run_dir / "meta.json").read_text())
-    waves = [np.load(f)["wave"] for f in sorted(run_dir.glob("sample_*.npz"))]
+    waves = []
+    for f in sorted(run_dir.glob("sample_*.npz")):
+        if num_samples is not None and len(waves) >= num_samples:
+            break
+        waves.append(np.load(f)["wave"])
     return meta, waves
+
+def downsample(run_dir: str | Path, factor: int, verbose: bool = False) -> None:
+    """Downsample all saved samples of one acquisition by the given factor."""
+    run_dir = Path(run_dir)
+    (run_dir / "ds").mkdir(parents=True, exist_ok=True)
+    for f in sorted(run_dir.glob("sample_*.npz")):
+        if verbose:
+            print(f"Downsampling {f} by factor {factor}...")
+        data = np.load(f)
+        wave = data["wave"]
+        wave_ds = wave[::factor]
+        np.savez(
+            # run_dir + "/ds/" + f.with_suffix("").name+".npz",
+            os.path.join(run_dir, "ds", f.with_suffix("").name + ".npz"),
+            wave=wave_ds.astype(np.float64),
+            index=data["index"],
+            fs=data["fs"] / factor,
+            dt=data["dt"] * factor,
+            n_points=len(wave_ds),
+            freq_res=data["freq_res"] * factor,
+            timestamp_device=data["timestamp_device"],
+            timestamp_host=data["timestamp_host"],
+        )
+def collect_downsampled(run_dir: str | Path, factor: int, verbose: bool = False) -> None:
+    """Collect all downsampled samples of one acquisition into a single file."""
+    run_dir = Path(run_dir)
+    ds_dir = run_dir / "ds"
+    if not ds_dir.exists():
+        raise FileNotFoundError(f"Downsampled directory {ds_dir} does not exist.")
+    waves = []
+    times = []
+    t0 = 0
+    td0 = 0
+
+    host_timestamps = []
+    for f in sorted(ds_dir.glob("sample_*.npz")):
+        if verbose:
+            print(f"Loading {f}...")
+        data = np.load(f)
+        if t0 == 0:
+            t0 = data["timestamp_host"]
+        if td0 == 0:
+            td0 = data["timestamp_device"]
+        waves.append(data["wave"])
+        timesteps = np.arange(len(data["wave"])) * data["dt"] + data["timestamp_host"] - t0
+        host_timestamps.append(data["timestamp_host"])
+        times.append(timesteps)
+    waves = np.concatenate(waves)
+    times = np.concatenate(times)
+    
+    np.savez(
+        run_dir / f"downsampled_{factor}.npz",
+        wave=waves.astype(np.float64),
+        times=times.astype(np.float64),
+        host_timestamps=np.array(host_timestamps, dtype=np.float64),
+        fs=data["fs"],
+        dt=data["dt"],
+        n_points=len(waves),
+        freq_res=data["freq_res"],
+        timestamp_device=td0,
+        timestamp_host=t0,
+    )
 
 
 if __name__ == "__main__":
 
     # session = ZICustomConnection.init_session("exp-pc-torus.ethz.ch", 8004)
-    from ziconnect import ZICustomConnection
-    session = ZICustomConnection.init_session("10.147.2.20", 8004)
-    acquire_power(
-        session,
-        serial="dev3917",
-        duration=3600*3,   # s total over all samples
-        freq_res=100.0,  # Hz
-        sample_rate=10e6,  # Sa/s (snapped to clockbase / 2**n)
-    )
+    # from ziconnect import ZICustomConnection
+    # session = ZICustomConnection.init_session("10.147.2.20", 8004)
+    # acquire_power(
+    #     session,
+    #     serial="dev3917",
+    #     duration=3600*3,   # s total over all samples
+    #     freq_res=100.0,  # Hz
+    #     sample_rate=10e6,  # Sa/s (snapped to clockbase / 2**n)
+    # )
 
-    # import matplotlib.pyplot as plt
     # samples = load_samples("data/power/dev3917_20261123_111038")
+    # samples = load_samples("data/power_remote/dev3917_20261123_111737")
+    # samples = load_samples("data/power_remote/dev3917_20261123_174831")
+
+    # samples = load_samples("data/power_remote/dev3917_20261123_111737", num_samples=10)
+    print("downsampling")
+    # downsample("data/power_remote/dev3917_20261123_111737", factor=100, verbose=True)
+    collect_downsampled("data/power_remote/dev3917_20261123_111737", factor=100, verbose=True)
+    
+    print("downsampling")
+    #downsample("data/power_remote/dev3917_20261123_174831", factor=100, verbose=True)
+    collect_downsampled("data/power_remote/dev3917_20261123_174831", factor=100, verbose=True)
+
+
+
+
+
     # plt.plot(samples[1][0])
     # plt.show()
 

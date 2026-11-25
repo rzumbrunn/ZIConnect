@@ -137,14 +137,13 @@ def test_pll_params(session, serial, P, I, D, F, actuation_BW, demod_BW, span, s
     session.devices[serial].pids[0].i(I)
     session.devices[serial].pids[0].d(D)
     session.devices[serial].pids[0].dlimittimeconstant(F)
-    session.devices[serial].pids[0].limitupper(actuation_BW / 2)
+    session.devices[serial].pids[0].limitupper(ctuation_BW / 2)
     session.devices[serial].pids[0].limitlower(-actuation_BW / 2)
     session.devices[serial].pids[0].demod.timeconstant(1.0 / (2 * np.pi * demod_BW * 2))  # adjust filter time constant to match the aquisition bandwidth f_3db = (1/(2*pi * tau))
+data/power_remote/dev3917_20261123_111737data/power_remote/dev3917_20261123_111737
 
-
-    # turn on PLL
-    session.devices[serial].pids[0].enable(1)
-
+     turn on PLL
+    session.devices[serial].[0]bl
     # wait for the PLL to stabilize
     print("Waiting for PLL to stabilize...")
     time.sleep(settle_time)  
