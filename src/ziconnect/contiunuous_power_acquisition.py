@@ -263,28 +263,28 @@ def collect_downsampled(run_dir: str | Path, factor: int, verbose: bool = False)
 if __name__ == "__main__":
 
     # session = ZICustomConnection.init_session("exp-pc-torus.ethz.ch", 8004)
-    # from ziconnect import ZICustomConnection
-    # session = ZICustomConnection.init_session("10.147.2.20", 8004)
-    # acquire_power(
-    #     session,
-    #     serial="dev3917",
-    #     duration=3600*3,   # s total over all samples
-    #     freq_res=100.0,  # Hz
-    #     sample_rate=10e6,  # Sa/s (snapped to clockbase / 2**n)
-    # )
+    from ziconnect import ZICustomConnection
+    session = ZICustomConnection.init_session("10.147.2.20", 8004)
+    acquire_power(
+        session,
+        serial="dev3917",
+        duration=3600,   # s total over all samples
+        freq_res=100.0,  # Hz
+        sample_rate=10e6,  # Sa/s (snapped to clockbase / 2**n)
+    )
 
     # samples = load_samples("data/power/dev3917_20261123_111038")
     # samples = load_samples("data/power_remote/dev3917_20261123_111737")
     # samples = load_samples("data/power_remote/dev3917_20261123_174831")
 
     # samples = load_samples("data/power_remote/dev3917_20261123_111737", num_samples=10)
-    print("downsampling")
-    # downsample("data/power_remote/dev3917_20261123_111737", factor=100, verbose=True)
-    collect_downsampled("data/power_remote/dev3917_20261123_111737", factor=100, verbose=True)
+    # print("downsampling")
+    # # downsample("data/power_remote/dev3917_20261123_111737", factor=100, verbose=True)
+    # collect_downsampled("data/power_remote/dev3917_20261123_111737", factor=100, verbose=True)
     
-    print("downsampling")
-    #downsample("data/power_remote/dev3917_20261123_174831", factor=100, verbose=True)
-    collect_downsampled("data/power_remote/dev3917_20261123_174831", factor=100, verbose=True)
+    # print("downsampling")
+    # #downsample("data/power_remote/dev3917_20261123_174831", factor=100, verbose=True)
+    # collect_downsampled("data/power_remote/dev3917_20261123_174831", factor=100, verbose=True)
 
 
 

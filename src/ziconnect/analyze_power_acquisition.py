@@ -50,7 +50,7 @@ def main():
         ds_factor = 10
         plot_ds_factor = 10
 
-        wave_ds = wave[::ds_factor] / np.average(wave[::ds_factor])  # Downsampled waveform, normalized
+        wave_ds = wave[::ds_factor] #/ np.average(wave[::ds_factor])  # Downsampled waveform, normalized
         t_ds = times[::ds_factor] - times[0]  # Downsampled time array, starting from 0
 
         currcol = 1
